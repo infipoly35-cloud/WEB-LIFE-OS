@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Jagraon Weather</title>
+
+<style>
+body{
+  margin:0;
+  font-family:system-ui;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  background:transparent;
+}
+
+.widget{
+  padding:16px 24px;
+  border-radius:16px;
+  backdrop-filter:blur(10px);
+  background:rgba(255,255,255,0.2);
+  text-align:center;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="widget">
+  <div id="temp">Loading...</div>
+  <div>Jagraon, Punjab</div>
+</div>
+
+<script>
+async function weather(){
+  const res = await fetch(
+    "https://api.open-meteo.com/v1/forecast?latitude=30.78&longitude=75.48&current_weather=true"
+  );
+
+  const data = await res.json();
+
+  document.getElementById("temp").innerHTML =
+    "🌤 " + data.current_weather.temperature + "°C";
+}
+
+weather();
+</script>
+
+</body>
+</html>
