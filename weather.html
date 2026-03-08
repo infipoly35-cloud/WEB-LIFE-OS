@@ -1,4 +1,277 @@
-<a class="weatherwidget-io" href="https://forecast7.com/en/30d7975d47/jagraon/" data-label_1="JAGRAON" data-label_2="WEATHER" data-icons="Climacons Animated" data-theme="weather_one" >JAGRAON WEATHER</a>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:system-ui;
+}
+
+body{
+height:100vh;
+color:white;
+background-size:cover;
+background-position:center;
+transition:background-image 1.2s ease;
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+padding:40px;
+}
+
+/* background readability overlay */
+
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.25);
+pointer-events:none;
+z-index:-1;
+}
+
+/* main weather */
+
+.top{
+display:flex;
+align-items:center;
+gap:20px;
+}
+
+.temp{
+font-size:64px;
+font-weight:600;
+}
+
+.condition{
+font-size:22px;
+opacity:0.9;
+}
+
+.city{
+font-size:16px;
+opacity:0.7;
+}
+
+/* floating animation */
+
+@keyframes float{
+0%{transform:translateY(0)}
+50%{transform:translateY(-6px)}
+100%{transform:translateY(0)}
+}
+
+.icon{
+font-size:60px;
+animation:float 3s ease-in-out infinite;
+}
+
+/* forecast */
+
+.forecast{
+display:flex;
+gap:25px;
+}
+
+.day{
+text-align:center;
+}
+
+.day-name{
+font-size:14px;
+opacity:0.8;
+}
+
+.day-temp{
+font-size:18px;
+font-weight:500;
+}
+
+.day-icon{
+font-size:26px;
+margin-bottom:4px;
+animation:float 3s ease-in-out infinite;
+}
+
+/* gradient readable text */
+
+.city,
+.temp,
+.condition,
+.day-name,
+.day-temp{
+
+background: linear-gradient(
+180deg,
+rgba(255,255,255,1) 0%,
+rgba(255,255,255,0.85) 60%,
+rgba(255,255,255,0.65) 100%
+);
+
+-webkit-background-clip:text;
+background-clip:text;
+color:transparent;
+
+text-shadow:0 2px 6px rgba(0,0,0,0.25);
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div>
+
+<div class="city">Jagraon</div>
+
+<div class="top">
+
+<div class="icon" id="icon">☀</div>
+
+<div>
+<div class="temp" id="temp">--°</div>
+<div class="condition" id="condition">Loading...</div>
+</div>
+
+</div>
+
+</div>
+
+<div class="forecast" id="forecast"></div>
+
 <script>
-!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+
+const lat = 30.79;
+const lon = 75.47;
+
+fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,weathercode,sunrise,sunset&current_weather=true&timezone=auto`)
+.then(r => r.json())
+.then(data => {
+
+const current = data.current_weather;
+const daily = data.daily;
+
+document.getElementById("temp").innerText = current.temperature + "°C";
+
+let condition = "Clear";
+let icon = "☀";
+
+/* weather condition detection */
+
+if(current.weathercode >= 1 && current.weathercode <= 3){
+condition = "Cloudy";
+icon = "☁";
+}
+
+if(current.weathercode >= 51 && current.weathercode <= 67){
+condition = "Rain";
+icon = "🌧";
+}
+
+if(current.weathercode >= 71 && current.weathercode <= 77){
+condition = "Snow";
+icon = "❄";
+}
+
+if(current.weathercode >= 80){
+condition = "Storm";
+icon = "⚡";
+}
+
+document.getElementById("condition").innerText = condition;
+document.getElementById("icon").innerText = icon;
+
+/* forecast */
+
+const forecast = document.getElementById("forecast");
+forecast.innerHTML = "";
+
+for(let i=1;i<6;i++){
+
+const day = document.createElement("div");
+day.className = "day";
+
+const name = new Date(daily.time[i]).toLocaleDateString("en",{weekday:"short"});
+
+let ic = "☀";
+const code = daily.weathercode[i];
+
+if(code >= 1 && code <= 3) ic="☁";
+if(code >= 51 && code <= 67) ic="🌧";
+if(code >= 71 && code <= 77) ic="❄";
+if(code >= 80) ic="⚡";
+
+day.innerHTML = `
+<div class="day-name">${name}</div>
+<div class="day-icon">${ic}</div>
+<div class="day-temp">${Math.round(daily.temperature_2m_max[i])}°</div>
+`;
+
+forecast.appendChild(day);
+
+}
+
+/* sunrise / sunset detection */
+
+const now = new Date();
+const sunrise = new Date(daily.sunrise[0]);
+const sunset = new Date(daily.sunset[0]);
+
+const isDay = now >= sunrise && now < sunset;
+
+/* background selection */
+
+if(condition === "Rain"){
+document.body.style.backgroundImage =
+"url('https://images.pexels.com/photos/110874/pexels-photo-110874.jpeg')";
+}
+
+else if(condition === "Cloudy"){
+
+if(isDay){
+document.body.style.backgroundImage =
+"url('https://images.pexels.com/photos/531756/pexels-photo-531756.jpeg')";
+}
+else{
+document.body.style.backgroundImage =
+"url('https://images.pexels.com/photos/414659/pexels-photo-414659.jpeg')";
+}
+
+}
+
+else if(condition === "Snow"){
+document.body.style.backgroundImage =
+"url('https://images.pexels.com/photos/688660/pexels-photo-688660.jpeg')";
+}
+
+else if(condition === "Storm"){
+document.body.style.backgroundImage =
+"url('https://images.pexels.com/photos/53459/lightning-storm-weather-sky-53459.jpeg')";
+}
+
+else{
+
+if(isDay){
+document.body.style.backgroundImage =
+"url('https://images.pexels.com/photos/459451/pexels-photo-459451.jpeg')";
+}
+
+else{
+document.body.style.backgroundImage =
+"url('https://images.pexels.com/photos/355465/pexels-photo-355465.jpeg')";
+}
+
+}
+
+});
+
 </script>
+
+</body>
+</html>
