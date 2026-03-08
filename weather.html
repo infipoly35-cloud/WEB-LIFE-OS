@@ -1,108 +1,44 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
+<div class="leaf-weather">
 
-<style>
-:root{
-  --leaf-primary:#2e7d32;
-  --leaf-light:#a5d6a7;
-  --leaf-bg:rgba(46,125,50,0.08);
-}
+<a class="weatherwidget-io"
+   href="https://forecast7.com/en/30d7975d47/jagraon/"
+   data-label_1="🍃 JAGRAON"
+   data-label_2="WEATHER"
+   data-theme="pure"
+   data-basecolor="#e8f5e9"
+   data-accent="#2e7d32"
+   data-textcolor="#1b5e20"
+   data-highcolor="#2e7d32"
+   data-lowcolor="#66bb6a"
+   data-suncolor="#ffca28"
+   data-mooncolor="#cfd8dc"
+   data-cloudcolor="#90a4ae"
+   data-cloudfill="#ffffff">
 
-body{
-  margin:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  font-family:system-ui;
-  background:black;
-}
+JAGRAON WEATHER
 
-.widget{
-  width:220px;
-  padding:18px;
-  border-radius:18px;
-
-  background:var(--leaf-bg);
-  backdrop-filter:blur(10px);
-
-  border:1px solid rgba(46,125,50,0.2);
-
-  box-shadow:
-    0 4px 20px rgba(0,0,0,0.08);
-
-  text-align:center;
-}
-
-.city{
-  font-size:14px;
-  color:var(--leaf-primary);
-  margin-bottom:6px;
-}
-
-.temp{
-  font-size:34px;
-  font-weight:600;
-  color:var(--leaf-primary);
-}
-
-.icon{
-  font-size:28px;
-  margin-bottom:6px;
-}
-
-.meta{
-  font-size:12px;
-  color:#4b6b4b;
-  margin-top:4px;
-}
-</style>
-</head>
-
-<body>
-
-<div class="widget">
-
-<div class="icon" id="icon">🍃</div>
-
-<div class="temp" id="temp">--°</div>
-
-<div class="city">Jagraon • Punjab</div>
-
-<div class="meta" id="wind"></div>
+</a>
 
 </div>
 
-<script>
-async function weather(){
-
-const res = await fetch(
-"https://api.open-meteo.com/v1/forecast?latitude=30.78&longitude=75.48&current_weather=true"
-);
-
-const data = await res.json();
-const w = data.current_weather;
-
-document.getElementById("temp").innerHTML =
-Math.round(w.temperature) + "°C";
-
-document.getElementById("wind").innerHTML =
-"Wind " + w.windspeed + " km/h";
-
-let icon="🌤";
-
-if(w.weathercode >= 61) icon="🌧";
-else if(w.weathercode >= 80) icon="⛈";
-else if(w.weathercode == 0) icon="☀️";
-
-document.getElementById("icon").innerHTML = icon;
-
+<style>
+.leaf-weather{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    max-width:320px;
+    margin:auto;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 6px 20px rgba(0,0,0,0.08);
 }
+</style>
 
-weather();
+<script>
+if(!document.getElementById("weatherwidget-io-js")){
+    const js = document.createElement("script");
+    js.id = "weatherwidget-io-js";
+    js.src = "https://weatherwidget.io/js/widget.min.js";
+    document.body.appendChild(js);
+}
 </script>
-
-</body>
-</html>
