@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<body style="background:black;color:#00ff00;font-family:monospace">
+
+<pre id="terminal"></pre>
+
+<script>
+const term = document.getElementById("terminal");
+
+const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+
+const steps = [
+"Loading Core Systems",
+"Initializing Brain",
+"Checking Goals",
+"Loading School Database",
+"Loading Career Roadmap",
+"Syncing Life Tasks",
+"Starting Motivation Engine",
+"Optimizing Focus"
+];
+
+async function boot(){
+
+term.innerText="> booting LIFE_OS v1.0...\n\n";
+
+for(let i=0;i<steps.length;i++){
+let bar="["+"■".repeat(i+1)+"□".repeat(9-i)+"]";
+term.innerText+=bar+" "+steps[i]+"\n";
+await sleep(400);
+}
+
+term.innerText+=`
+\n✔ School System Online
+✔ Career Roadmap Online
+✔ Life Tasks Online
+
+Welcome back, Operator.
+`;
+}
+
+boot();
+</script>
+
+</body>
+</html>
