@@ -1,44 +1,152 @@
-<div class="leaf-weather">
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
 
-<a class="weatherwidget-io"
-   href="https://forecast7.com/en/30d7975d47/jagraon/"
-   data-label_1="🍃 JAGRAON"
-   data-label_2="WEATHER"
-   data-theme="pure"
-   data-basecolor="#e8f5e9"
-   data-accent="#2e7d32"
-   data-textcolor="#1b5e20"
-   data-highcolor="#2e7d32"
-   data-lowcolor="#66bb6a"
-   data-suncolor="#ffca28"
-   data-mooncolor="#cfd8dc"
-   data-cloudcolor="#90a4ae"
-   data-cloudfill="#ffffff">
+<style>
 
-JAGRAON WEATHER
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
-</a>
+html,body{
+width:100%;
+height:100%;
+overflow:hidden; /* removes scrollbars */
+font-family:sans-serif;
+background:transparent;
+}
+
+/* FULLSCREEN RESPONSIVE WIDGET */
+
+.widget{
+width:100vw;
+height:100dvh; /* better than vh for responsiveness */
+
+display:flex;
+flex-direction:column;
+justify-content:flex-end;
+
+padding:clamp(16px,4vw,40px);
+
+color:white;
+position:relative;
+overflow:hidden;
+
+background-size:cover;
+background-position:center;
+}
+
+/* Forest backgrounds */
+
+.day{
+background-image:url("https://images.unsplash.com/photo-1501785888041-af3ef285b470");
+}
+
+.sunset{
+background-image:url("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee");
+}
+
+.night{
+background-image:url("https://images.unsplash.com/photo-1470115636492-6d2b56f9146d");
+}
+
+.rain{
+background-image:url("https://images.unsplash.com/photo-1500382017468-9049fed747ef");
+}
+
+/* rain overlay */
+
+.rain::before{
+content:"";
+position:absolute;
+inset:0;
+pointer-events:none;
+
+background:repeating-linear-gradient(
+transparent,
+transparent 2px,
+rgba(255,255,255,0.15) 3px
+);
+
+animation:rain 0.4s linear infinite;
+}
+
+@keyframes rain{
+from{background-position:0 0}
+to{background-position:-20px 100px}
+}
+
+/* responsive text */
+
+.temp{
+font-size:clamp(40px,8vw,90px);
+font-weight:bold;
+}
+
+.city{
+font-size:clamp(16px,2vw,28px);
+opacity:.9;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="widget day" id="widget">
+
+<div class="temp" id="temp">--°C</div>
+<div class="city">Jagraon • Punjab</div>
 
 </div>
 
-<style>
-.leaf-weather{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    max-width:320px;
-    margin:auto;
-    border-radius:16px;
-    overflow:hidden;
-    box-shadow:0 6px 20px rgba(0,0,0,0.08);
-}
-</style>
-
 <script>
-if(!document.getElementById("weatherwidget-io-js")){
-    const js = document.createElement("script");
-    js.id = "weatherwidget-io-js";
-    js.src = "https://weatherwidget.io/js/widget.min.js";
-    document.body.appendChild(js);
+
+async function weather(){
+
+const res = await fetch(
+"https://api.open-meteo.com/v1/forecast?latitude=30.78&longitude=75.48&current_weather=true"
+);
+
+const data = await res.json();
+const w = data.current_weather;
+
+document.getElementById("temp").innerHTML =
+Math.round(w.temperature) + "°C";
+
+const hour = new Date().getHours();
+const widget = document.getElementById("widget");
+
+/* time based forest */
+
+if(hour >= 6 && hour < 17){
+widget.className = "widget day";
 }
+else if(hour >= 17 && hour < 19){
+widget.className = "widget sunset";
+}
+else{
+widget.className = "widget night";
+}
+
+/* rain override */
+
+if(w.weathercode >= 60){
+widget.className = "widget rain";
+}
+
+}
+
+/* run once immediately */
+weather();
+
+/* auto refresh every 10 minutes */
+setInterval(weather, 600000);
+
 </script>
+
+</body>
+</html>
